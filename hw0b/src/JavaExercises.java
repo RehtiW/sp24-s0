@@ -54,24 +54,23 @@ public class JavaExercises {
       *    - Continue this process until n is 1
       */
     public static List<Integer> hailstone(int n) {
-        List<Integer> list=new ArrayList<>();
-        list.add(n);
-        return hailstoneHelper(n,list);
+        return hailstoneHelper(n, new ArrayList<>());
     }
 
     private static List<Integer> hailstoneHelper(int x, List<Integer> list) {
         // TODO: Fill in this function.
 
         if(x==1){
+            list.add(x);
             return list;
         }else if(x%2!=0){
-            list.add(x*3+1);
-            return hailstoneHelper(x*3+1,list);
+            list.add(x);
+            x = 3 * x + 1;
         }else if(x%2==0){
-            list.add(x/2);
-            return hailstoneHelper(x/2,list);
+            list.add(x);
+            x=x/2;
         }
-        return list;
+        return hailstoneHelper(x,list);
     }
 
 }
