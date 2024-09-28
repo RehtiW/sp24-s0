@@ -25,7 +25,7 @@ public class Model {
     public static final int MAX_PIECE = 2048;
 
     /** A new 2048 game on a board of size SIZE with no pieces
-     *  and score 0. */
+     *  and score 0. */ //构造函数
     public Model(int size) {
         board = new Board(size);
         score = 0;
@@ -85,6 +85,12 @@ public class Model {
      * */
     public boolean emptySpaceExists() {
         // TODO: Task 2. Fill in this function.
+        for(int x=0;x< board.size();x++){
+            for(int y=0;y< board.size();y++){
+                if(tile(x,y)==null)
+                    return true;
+            }
+        }
         return false;
     }
 
@@ -95,6 +101,13 @@ public class Model {
      */
     public boolean maxTileExists() {
         // TODO: Task 3. Fill in this function.
+        for(int x=0;x< board.size();x++){
+            for(int y=0;y<board.size();y++){
+                if(tile(x,y)!=null && tile(x,y).value()==MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -106,6 +119,20 @@ public class Model {
      */
     public boolean atLeastOneMoveExists() {
         // TODO: Fill in this function.
+        if(emptySpaceExists()){
+            return true;
+        }
+        for(int x=0;x< board.size();x++){
+            for(int y=0;y< board.size();y++){
+                Tile current=tile(x,y);
+                //check right
+                if(x+1< board.size() && current.value()==tile(x+1,y).value())
+                    return true;
+                //check up;
+                if(y+1< board.size() && current.value()==tile(x,y+1).value())
+                    return true;
+            }
+        }
         return false;
     }
 
@@ -124,11 +151,31 @@ public class Model {
      *    and the trailing tile does not.
      */
     public void moveTileUpAsFarAsPossible(int x, int y) {
+        // TODO: Tasks 5, 6, and 10. Fill in this function.
         Tile currTile = board.tile(x, y);
         int myValue = currTile.value();
         int targetY = y;
+        if(currTile==null)
+            return;
+        //行至边缘或遭遇非空
+        while (targetY < board.size() - 1 && board.tile(x, targetY + 1) == null) {
+            targetY += 1;
+        }
+        //若遭遇非空
+        if (targetY < board.size() - 1) {
+            Tile nextTile = board.tile(x, targetY + 1);
+            //同值
+            if (nextTile != null && nextTile.value() == myValue && !currTile.wasMerged() && !nextTile.wasMerged()) {
+                score += myValue * 2;
+                board.move(x, targetY + 1, currTile);
+            } else {//不同值
+                if(targetY!=y) //若targetY==y 则没必要移动,即一开始currTile上方就有不同值的瓦片
+                    board.move(x, targetY, currTile);
+            }
+        } else {//到边缘
+            board.move(x, targetY, currTile);
+        }
 
-        // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
 
     /** Handles the movements of the tilt in column x of the board
@@ -138,10 +185,20 @@ public class Model {
      * */
     public void tiltColumn(int x) {
         // TODO: Task 7. Fill in this function.
+        for(int r=size()-2;r>=0;r--){
+            Tile currTile=tile(x,r);
+            if(currTile!=null)
+                moveTileUpAsFarAsPossible(x,r);
+        }
     }
 
     public void tilt(Side side) {
         // TODO: Tasks 8 and 9. Fill in this function.
+        board.setViewingPerspective(side);
+        for(int x=0;x<size();x++){
+            tiltColumn(x);
+        }
+        board.setViewingPerspective(Side.NORTH);
     }
 
     /** Tilts every column of the board toward SIDE.
