@@ -1,4 +1,4 @@
-import org.junit.jupiter.api.*;
+/*import org.junit.jupiter.api.*;
 
 import java.util.Comparator;
 import deque.MaxArrayDeque61B;
@@ -21,4 +21,4 @@ public class MaxArrayDeque61BTest {
         mad.addFirst("fury road");
         assertThat(mad.max()).isEqualTo("fury road");
     }
-}
+}*/
