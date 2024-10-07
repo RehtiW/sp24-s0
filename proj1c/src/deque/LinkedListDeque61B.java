@@ -147,11 +147,11 @@ public class LinkedListDeque61B<T> implements  Deque61B<T>{
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(Object other) { //默认实现仅仅比较引用是否相等
         if(this == other){
             return true;
         }
-        if (other instanceof LinkedListDeque61B<?> otherList) {
+        if (other instanceof LinkedListDeque61B<?> otherList) { //检查类型相同
             if(this.size!=otherList.size){
                 return false;
             }
