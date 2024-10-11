@@ -50,7 +50,13 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @param node
      */
     void flipColors(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
+        node.isBlack=!node.isBlack;
+        if(node.left != null){
+            node.left.isBlack=!node.left.isBlack;
+        }
+        if(node.right != null){
+            node.right.isBlack=!node.right.isBlack;
+        }
     }
 
     /**
@@ -61,8 +67,15 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> newRoot = node.left;
+        node.left=newRoot.right;
+        newRoot.right=node;
+
+        boolean tmp;
+        tmp= newRoot.isBlack;
+        newRoot.isBlack=node.isBlack;
+        node.isBlack=tmp;
+        return newRoot;
     }
 
     /**
@@ -73,8 +86,13 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> newRoot = node.right;
+        node.right=newRoot.left;
+        newRoot.left=node;
+
+        newRoot.isBlack=node.isBlack;
+        node.isBlack=false;
+        return newRoot;
     }
 
     /**
@@ -105,17 +123,32 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
-        // TODO: Insert (return) new red leaf node.
+        //自底向上式更新红黑树,使其仍然保持平衡
+        if(node == null){
+            return new RBTreeNode<>(false,item);
+        }
+        int cmp= item.compareTo(node.item);
+        if(cmp<0){
+            node.left=insert(node.left,item);
+        }else if(cmp > 0){
+            node.right=insert(node.right,item);
+        }else{
+            return node;
+        }
 
-        // TODO: Handle normal binary search tree insertion.
+        if(isRed(node.right) && !isRed(node.left)){ //右倾红色节点
+            node = rotateLeft(node); //更新父节点
+        }
 
-        // TODO: Rotate left operation
+        if (isRed(node.left) && isRed(node.left.left)) { //红色节点作为父节点
+            node = rotateRight(node);
+        }
 
-        // TODO: Rotate right operation
+        if (isRed(node.left) && isRed(node.right)) {     //两个子节点均为红色节点
+            flipColors(node);
+        }
 
-        // TODO: Color flip
-
-        return null; //fix this return statement
+        return node; //返回更新的节点
     }
 
 }
