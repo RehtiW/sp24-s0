@@ -1,6 +1,6 @@
 package hashmap;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  *  A hash table-backed Map implementation.
@@ -26,12 +26,21 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     /* Instance Variables */
     private Collection<Node>[] buckets;
-    // You should probably define some more!
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private Double loadFactor;
+    private int capacity;
+    private int size;
+    private Set<K> set;
 
     /** Constructors */
-    public MyHashMap() { }
+    public MyHashMap() {
+        this(DEFAULT_CAPACITY);
+    }
 
-    public MyHashMap(int initialCapacity) { }
+    public MyHashMap(int initialCapacity) {
+        this(initialCapacity,LOAD_FACTOR);
+    }
 
     /**
      * MyHashMap constructor that creates a backing array of initialCapacity.
@@ -40,34 +49,137 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialCapacity initial size of backing array
      * @param loadFactor maximum load factor
      */
-    public MyHashMap(int initialCapacity, double loadFactor) { }
+    public MyHashMap(int initialCapacity, double loadFactor) {
+        buckets=new Collection[initialCapacity];
+        for(int i=0;i<initialCapacity;i++){
+            buckets[i]=createBucket();
+        }
+        this.loadFactor=loadFactor;
+        capacity=initialCapacity;
+        set = new HashSet<>();
+        size=0;
+    }
 
-    /**
-     * Returns a data structure to be a hash table bucket
-     *
-     * The only requirements of a hash table bucket are that we can:
-     *  1. Insert items (`add` method)
-     *  2. Remove items (`remove` method)
-     *  3. Iterate through items (`iterator` method)
-     *  Note that that this is referring to the hash table bucket itself,
-     *  not the hash map itself.
-     *
-     * Each of these methods is supported by java.util.Collection,
-     * Most data structures in Java inherit from Collection, so we
-     * can use almost any data structure as our buckets.
-     *
-     * Override this method to use different data structures as
-     * the underlying bucket type
-     *
-     * BE SURE TO CALL THIS FACTORY METHOD INSTEAD OF CREATING YOUR
-     * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
-     */
     protected Collection<Node> createBucket() {
-        // TODO: Fill in this method.
+        return new LinkedList<>();
+    }
+
+    private int getIndex(K key){
+        return Math.floorMod(key.hashCode(),capacity);
+    }
+
+    private void resize(){
+        int newCapacity=capacity*2;
+        Collection<Node>[]newBuckets=new Collection[newCapacity];
+        for(int i=0;i<newCapacity;i++){
+            newBuckets[i]=createBucket();
+        }
+        //rehash
+        for(Collection<Node> whichBucket:buckets){
+            for(Node node:whichBucket){
+                int index=Math.floorMod(node.key.hashCode(),newCapacity);
+                newBuckets[index].add(new Node(node.key,node.value));
+            }
+        }
+        capacity=newCapacity;
+        buckets=newBuckets;
+    }
+    @Override
+    public void put(K key, V value) {
+        if(key==null){
+            throw new IllegalArgumentException("Null keys are not allowed");
+        }
+        int index=getIndex(key);
+        Collection<Node>whichBucket=buckets[index];
+        for(Node node:whichBucket){
+            if(node.key.equals(key)){
+                node.value=value;
+                return;
+            }
+        }
+        whichBucket.add(new Node(key,value));
+        set.add(key);
+        size++;
+        if (size > loadFactor * capacity) {
+            resize();
+        }
+
+    }
+
+    @Override
+    public V get(K key) {
+        if(key == null){
+            throw new IllegalArgumentException("key can not be null");
+        }
+        int index=getIndex(key);
+        Collection<Node>whichBucket=buckets[index];
+        for(Node node:whichBucket){
+            if(node.key.equals(key)){
+                return node.value;
+            }
+        }
+        return null;
+
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        if(key == null){
+            throw new IllegalArgumentException("key can not be null");
+        }
+        int index=getIndex(key);
+        Collection<Node>whichBucket=buckets[index];
+        for(Node node:whichBucket){
+            if(node.key.equals(key)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public void clear() {
+        for(Collection<Node> bucket:buckets){
+            bucket.clear();
+        }
+        set.clear();
+        size = 0;
+    }
+
+    @Override
+    public Set<K> keySet() {
+        return set;
+    }
+
+    @Override
+    public V remove(K key) {
+        if(key == null){
+            throw new IllegalArgumentException("key cannot be null");
+        }
+        int index=getIndex(key);
+        Collection<Node>whichBucket=buckets[index];
+        Iterator<Node>iterator=whichBucket.iterator();
+        while(iterator.hasNext()){
+            Node node=iterator.next();
+            if(node.key.equals(key)){
+                V returnVal=node.value;
+                iterator.remove();
+                set.remove(key);
+                size -- ;
+                return returnVal;
+            }
+        }
         return null;
     }
 
-    // TODO: Implement the methods of the Map61B Interface below
-    // Your code won't compile until you do so!
+    @Override
+    public Iterator<K> iterator() {
+        return keySet().iterator();
+    }
 
 }
