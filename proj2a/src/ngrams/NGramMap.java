@@ -47,7 +47,7 @@ public class NGramMap {
         // 读取countsFilename文件
         In countsFile = new In(countsFilename);
         while (countsFile.hasNextLine()) {
-            String[] tokens = countsFile.readLine().split("\\s+");
+            String[] tokens = countsFile.readLine().split(",");
             int year = Integer.parseInt(tokens[0]);
             double totalCount = Double.parseDouble(tokens[1]);
 
@@ -103,12 +103,7 @@ public class NGramMap {
     public TimeSeries weightHistory(String word, int startYear, int endYear) {
         TimeSeries countHistory = countHistory(word, startYear, endYear);  // 获取该单词的计数历史
         TimeSeries weightHistory = new TimeSeries();
-        for (int year : countHistory.years()) {
-            if (totalCounts.containsKey(year)) {
-                double relativeFrequency = countHistory.get(year) / totalCounts.get(year);
-                weightHistory.put(year, relativeFrequency);
-            }
-        }
+        weightHistory = countHistory.dividedBy(totalCountHistory());
         return weightHistory;
     }
 
