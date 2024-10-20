@@ -2,42 +2,48 @@ package main;
 
 import browser.NgordnetQuery;
 import browser.NgordnetQueryHandler;
+import browser.NgordnetQueryType;
+import graph.Graph;
+import ngrams.NGramMap;
 import java.util.*;
+
+
 public class HyponymsHandler extends NgordnetQueryHandler {
 
-    private Graph wordNetGraph;
-
-    public HyponymsHandler(Graph graph){
-        this.wordNetGraph=graph;
+    private HyponymsHelper helper;
+    public HyponymsHandler(Graph graph,NGramMap ngm){
+        helper = new HyponymsHelper(graph,ngm);
     }
 
 
-    @Override
-    public String handle(NgordnetQuery q) {
-        // 获取查询的单词
-        List<String> wordList = q.words();  //处理多个单词
-        Set<String> hyponyms=new HashSet<>();
-        for(int i=0;i<wordList.size();i++){
-            hyponyms.addAll(wordNetGraph.getHyponyms(wordList.get(i)));
-        }
-        TreeSet<String> sortedHyponyms = new TreeSet<>(hyponyms);
+    public String handle(NgordnetQuery query) {
+        List<String> words = query.words();
+        int k = query.k(); // 获取要限制的数量
+        int start = query.startYear();
+        int end = query.endYear();
+        NgordnetQueryType queryType = query.ngordnetQueryType();
 
-        // 将结果格式化成要求的字符串格式
-        StringBuilder result = new StringBuilder();
-        result.append("[");
-        // 添加排序后的下位词
-        boolean first = true;
-        for (String hyponym : sortedHyponyms) {
-            if (!first) {
-                result.append(", ");
+        if (queryType == NgordnetQueryType.HYPONYMS) {
+            // 获取下位词交集
+            Set<String> commonHyponyms = helper.getCommonHyponyms(words);
+            // 根据k的值筛选交集
+            if (k > 0) {
+                return helper.getTopKOutput(commonHyponyms, k, start, end);
+            } else {
+                return helper.formatOutput(commonHyponyms); // k为0时返回所有下位词
             }
-            result.append(hyponym);
-            first = false;
+        } else if (queryType == NgordnetQueryType.ANCESTORS) {
+            Set<String> commonAncestors = helper.getCommonAncestors(words);
+            if(k > 0){
+                return helper.getTopKOutput(commonAncestors,k,start,end);
+            }else{
+                return helper.formatOutput(commonAncestors);
+            }
         }
+        return null;
 
-        result.append("]");
-
-        return result.toString();
     }
-
 }
+
+/* ----------------------------------------------------------------------*/
+

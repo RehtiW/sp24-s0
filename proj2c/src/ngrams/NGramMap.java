@@ -1,12 +1,13 @@
 package ngrams;
 
-import java.sql.Time;
+import edu.princeton.cs.algs4.In;
+
 import java.util.Collection;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
 import static ngrams.TimeSeries.MAX_YEAR;
 import static ngrams.TimeSeries.MIN_YEAR;
-import edu.princeton.cs.algs4.In;
 /**
  * An object that provides utility methods for making queries on the
  * Google NGrams dataset (or a subset thereof).
@@ -141,8 +142,20 @@ public class NGramMap {
         return summedWeightHistory(words, MIN_YEAR, MAX_YEAR);
     }
 
+    public Double allTimeWeighted(String word,int start,int end){
+        Double wordCounts = 0.0;
+        Double totalCounts = 0.0;
+        TimeSeries words= countHistory(word,start,end);
+        TimeSeries copy = totalCountHistory();
+        for(int year : words.years()){
+            wordCounts += words.get(year);
+        }
+        for(int year : copy.years()){
+            totalCounts += copy.get(year);
+        }
+        return wordCounts/totalCounts;
+    }
 
 
-    // TODO: Add any private helper methods.
-    // TODO: Remove all TODO comments before submitting.
+
 }
