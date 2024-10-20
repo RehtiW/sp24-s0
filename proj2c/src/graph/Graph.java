@@ -1,6 +1,12 @@
-package main;
-import java.util.*;
+package graph;
+
+
 import edu.princeton.cs.algs4.In;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /*表示单词ID之间的上下位关系*/
 public class Graph {
     private Map<Integer,Set<Integer>> adjList;
@@ -9,7 +15,7 @@ public class Graph {
     public Graph(){
         adjList=new HashMap<>();
     }
-
+                        //上位词ID,下位词ID
     public void addEdge(int hypernymId, int hyponymId) {
         adjList.computeIfAbsent(hypernymId,k-> new HashSet<>()).add(hyponymId);
     }
