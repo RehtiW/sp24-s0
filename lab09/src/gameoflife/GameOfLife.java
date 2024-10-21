@@ -1,6 +1,7 @@
 package gameoflife;
 
 import edu.princeton.cs.algs4.StdDraw;
+import picocli.CommandLine;
 import tileengine.TERenderer;
 import tileengine.TETile;
 import tileengine.Tileset;
@@ -83,14 +84,14 @@ public class GameOfLife {
      * @param test
      */
     public GameOfLife(TETile[][] tiles, boolean test) {
-        TETile[][] transposeState = transpose(tiles);
+        TETile[][] transposeState = transpose(tiles);  //转置矩阵
         this.currentState = flip(transposeState);
         this.width = tiles[0].length;
         this.height = tiles.length;
     }
 
     /**
-     * Flips the matrix along the x-axis.
+         * Flips the matrix along the x-axis.
      * @param tiles
      * @return
      */
@@ -234,18 +235,48 @@ public class GameOfLife {
      */
     public TETile[][] nextGeneration(TETile[][] tiles) {
         TETile[][] nextGen = new TETile[width][height];
-        // The board is filled with Tileset.NOTHING
         fillWithNothing(nextGen);
+        int[][] steps = {
+                {1, 0},
+                {0, 1},
+                {1, 1},
+                {-1, 0},
+                {0, -1},
+                {-1, -1},
+                {1, -1},
+                {-1, 1}
+        };
 
-        // TODO: Implement this method so that the described transitions occur.
-        // TODO: The current state is represented by TETiles[][] tiles and the next
-        // TODO: state/evolution should be returned in TETile[][] nextGen.
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                int liveNeighbors = 0;
 
+                // 计算邻居细胞的数量
+                for (int[] step : steps) {
+                    int x = j + step[0];
+                    int y = i + step[1];
 
+                    if (y >= height || y < 0 || x >= width || x < 0) {
+                        continue;
+                    }
+                    if (tiles[y][x] == Tileset.CELL) {
+                        liveNeighbors++;
+                    }
+                }
 
-
-        // TODO: Returns the next evolution in TETile[][] nextGen.
-        return null;
+                // 更新细胞状态
+                if (tiles[i][j] == Tileset.CELL) {
+                    if (liveNeighbors < 2 || liveNeighbors > 3) {
+                        nextGen[i][j] = Tileset.NOTHING;
+                    } else {
+                        nextGen[i][j] = Tileset.CELL;
+                    }
+                } else if (tiles[i][j] == Tileset.NOTHING && liveNeighbors == 3) {
+                    nextGen[i][j] = Tileset.CELL;
+                }
+            }
+        }
+        return nextGen;
     }
 
     /**
@@ -253,7 +284,7 @@ public class GameOfLife {
      * @param tiles
      */
     public void saveBoard(TETile[][] tiles) {
-        TETile[][] transposeState = transpose(tiles);
+        TETile[][] transposeState = transpose(tiles); //转置
         this.currentState = flip(transposeState);
         this.width = tiles[0].length;
         this.height = tiles.length;
@@ -266,46 +297,66 @@ public class GameOfLife {
      * 0 represents NOTHING, 1 represents a CELL.
      */
     public void saveBoard() {
-        // TODO: Save the dimensions of the board into the first line of the file.
-        // TODO: The width and height should be separated by a space, and end with "\n".
+        // 获取当前状态
+        TETile[][] currentBoard = currentState;
+        int width = currentBoard.length;
+        int height = currentBoard[0].length;
 
+        StringBuilder sb = new StringBuilder();
+        sb.append(width).append(" ").append(height).append("\n");
+        //tiles[0][0]位于左下角
+        for (int y = height - 1; y >= 0; y--) {
+            for (int x = 0; x < width; x++) {
+                if (currentBoard[x][y] == Tileset.NOTHING) {
+                    sb.append("0");
+                } else {
+                    sb.append("1");
+                }
+            }
+            sb.append("\n"); // 每行结束后添加换行符
+        }
 
-
-        // TODO: Save the current state of the board into save.txt. You should
-        // TODO: use the provided FileUtils functions to help you. Make sure
-        // TODO: the orientation is correct! Each line in the board should
-        // TODO: end with a new line character.
-
-
-
-
-
+        // 调用 FileUtils 的写入方法
+        FileUtils.writeFile(SAVE_FILE, sb.toString());
     }
+
+
 
     /**
      * Loads the board from filename and returns it in a 2D TETile array.
      * 0 represents NOTHING, 1 represents a CELL.
      */
     public TETile[][] loadBoard(String filename) {
-        // TODO: Read in the file.
+        // 从文件中读取数据
+        String fileContent = FileUtils.readFile(filename);
+        String[] lines = fileContent.split("\n");
 
-        // TODO: Split the file based on the new line character.
+        // 读取宽度和高度
+        String[] dimensions = lines[0].split(" ");
+        int width = Integer.parseInt(dimensions[0]);
+        int height = Integer.parseInt(dimensions[1]);
 
-        // TODO: Grab and set the dimensions from the first line.
+        // 初始化 TETile[][] 数组
+        TETile[][] board = new TETile[width][height];
 
-        // TODO: Create a TETile[][] to load the board from the file into
-        // TODO: and any additional variables that you think might help.
+        // 从文件中加载每个单元格的状态
+        for (int y = 0; y < height; y++) {
+            String row = lines[y + 1]; // 从第二行开始读取
+            for (int x = 0; x < width; x++) {
+                char cell = row.charAt(x);
+                if(cell == '1'){
+                    board[y][x] = Tileset.CELL;
+                }else if(cell == '0'){
+                    board[y][x] = Tileset.NOTHING;
+                }
+            }
+        }
 
+        // 初始化实例变量
+        this.width = width;
+        this.height = height;
 
-        // TODO: Load the state of the board from the given filename. You can
-        // TODO: use the provided builder variable to help you and FileUtils
-        // TODO: functions. Make sure the orientation is correct!
-
-
-
-
-        // TODO: Return the board you loaded. Replace/delete this line.
-        return null;
+        return board;
     }
 
     /**
