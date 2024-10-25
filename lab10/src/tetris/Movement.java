@@ -53,7 +53,7 @@ public class Movement {
         } else {
             if (deltaY < 0) {
                 TETile[][] board = tetris.getBoard();
-                Tetromino.draw(t, board, t.pos.x, t.pos.y);
+                Tetromino.draw(t, board, t.pos.x, t.pos.y); //不能移动,则在放置在该位置
                 tetris.fillAux();
 
                 tetris.setAuxTrue();
