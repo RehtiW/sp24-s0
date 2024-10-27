@@ -80,6 +80,20 @@ public class UnionFindTest {
         }
     }
 
+    @Test
+    public void pathCompressionTest() {
+        UnionFind uf = new UnionFind(8);
+        uf.union(1, 0);
+        uf.union(3, 2);
+        uf.union(3, 0);
+        uf.union(5, 4);
+        uf.union(7, 6);
+        uf.union(7, 4); //   0  1  2  3  4  5  6  7
+        uf.union(4, 0); // [-8, 0, 0, 2, 0, 4, 4, 6]
+        assertThat(uf.find(7)).isEqualTo(0);
+        assertThat(uf.parent(6)).isEqualTo(0);
+    }
+
     /**
      * Write your own tests below here to verify for correctness. The given tests are not comprehensive.
      * Specifically, you may want to write a test for path compression and to check for the correctness

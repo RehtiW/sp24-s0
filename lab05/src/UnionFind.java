@@ -47,7 +47,7 @@ public class UnionFind {
         if(parentOf[v]<0){
             return v;
         }else{
-            parentOf[v]=find((parentOf[v]));
+            parentOf[v]=find((parentOf[v])); //剪枝
             return parentOf[v];
         }
 
@@ -60,12 +60,12 @@ public class UnionFind {
        already connected should not change the structure. */
     public void union(int v1, int v2) {
         if(!connected(v1,v2)){
-            if(sizeOf(v1)<=sizeOf(v2)){
-                parentOf[find(v1)] = find(v2);
+            if(sizeOf(v1)<=sizeOf(v2)){//weighted union
                 parentOf[find(v2)] -= sizeOf(v1);
+                parentOf[find(v1)] = find(v2); //v1祖先悬挂在v2祖先下
             }else{
-                parentOf[find(v2)] = find(v1);
                 parentOf[find(v1)] -= sizeOf(v2);
+                parentOf[find(v2)] = find(v1);
             }
         }
     }
