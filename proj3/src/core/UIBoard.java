@@ -13,6 +13,7 @@ public class UIBoard {
     private int UIHeight;
     private TERenderer UIRenderer;
     private TETile[][] UIBoard;
+    private long seed;
     //starter UI
     public UIBoard(int width,int height){
         UIWidth = width;
@@ -26,14 +27,14 @@ public class UIBoard {
             }
         }
     }
-
+    //绘制初始UI
     public void drawUI(){
         UIRenderer.drawTiles(UIBoard);
         String[] menuItems = {"New Game (N)", "Load Game (L)", "Quit (Q)"};
         // 计算每行的 Y 坐标位置
         double centerX = UIWidth/2;
         double centerY = UIHeight/2;
-        double lineSpacing = 2; // 行间距，可以根据需要调整
+        double lineSpacing = 2; // 行间距
         StdDraw.setPenColor(Color.white);
         StdDraw.setFont(new Font("Arial", Font.PLAIN, 20));
         // 绘制多行文本
@@ -45,11 +46,13 @@ public class UIBoard {
 
         StdDraw.show();
     }
-
+    //绘制输入种子UI
     public void seedInputUI(){
         double centerX = UIWidth/2;
         double centerY = UIHeight/2;
-        StdDraw.clear();
+        StringBuilder seedInput = new StringBuilder();
+        //show the seedInputUI
+        StdDraw.clear(); //clear last UI
         UIRenderer.drawTiles(UIBoard);
         StdDraw.setPenColor(Color.white);
         StdDraw.setFont(new Font("Arial", Font.PLAIN, 26));
@@ -57,9 +60,32 @@ public class UIBoard {
         StdDraw.setFont(new Font("Arial", Font.PLAIN, 22));
         StdDraw.text(centerX,centerY*1.5,"input your seed");
         StdDraw.show();
+        //show the seedInputProcess
+        while(true){
+            if(StdDraw.hasNextKeyTyped()){
+                char key = StdDraw.nextKeyTyped();
+                if(key == '\n'){
+                    seed = (seedInput.toString()).hashCode();
+                    break;
+                }
+                seedInput.append(key);
+                //清除旧内容
+                StdDraw.clear();
+                UIRenderer.drawTiles(UIBoard);
+                StdDraw.setPenColor(Color.white);
+                StdDraw.setFont(new Font("Arial", Font.PLAIN, 26));
+                StdDraw.text(centerX, centerY * 1.75, "CS61B: THE GAME");
+                StdDraw.setFont(new Font("Arial", Font.PLAIN, 22));
+                StdDraw.text(centerX, centerY * 1.5, "Input your seed:");
+                StdDraw.setFont(new Font("Arial", Font.PLAIN, 20));
+                StdDraw.text(centerX, centerY * 1.25, seedInput.toString()); // 显示当前输入
+
+                StdDraw.show();
+            }
+        }
     }
 
-
-
-
+    public long getSeed() {
+        return seed;
+    }
 }
