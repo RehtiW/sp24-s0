@@ -30,8 +30,9 @@ public class World {
                 this.world[x][y] = Tileset.NOTHING;
             }
         }
-        room.generateRooms(this.world,50);
-        room.addWalls(world);
+        room.generateRooms(this.world,100);
+        //room.addCorridor(this.world);
+        //room.addWalls(world);
     }
 
 
