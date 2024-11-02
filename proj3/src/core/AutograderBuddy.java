@@ -19,9 +19,9 @@ public class AutograderBuddy {
      * @return the 2D TETile[][] representing the state of the world
      */
     public static TETile[][] getWorldFromInput(String input) {
-
-        throw new RuntimeException("Please fill out AutograderBuddy!");
-
+        long ip =input.hashCode();
+        World world = new World(ip);
+        return world.getWorld();
     }
 
 

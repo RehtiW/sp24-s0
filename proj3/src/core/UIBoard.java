@@ -9,27 +9,26 @@ import tileengine.Tileset;
 import java.awt.*;
 
 public class UIBoard {
-    private int UIWidth;
-    private int UIHeight;
+    private int UIWidth = 30;
+    private int UIHeight = 40;
     private TERenderer UIRenderer;
     private TETile[][] UIBoard;
     private long seed;
     //starter UI
-    public UIBoard(int width,int height){
-        UIWidth = width;
-        UIHeight = height;
+    public UIBoard(){
         UIRenderer = new TERenderer();
-        UIRenderer.initialize(width,height);
-        this.UIBoard = new TETile[width][height];
+        UIRenderer.initialize(UIWidth,UIHeight);
+        this.UIBoard = new TETile[UIWidth][UIHeight];
         for(int x=0;x<UIWidth;x++){
             for(int y=0;y<UIHeight;y++){
                 UIBoard[x][y] = Tileset.NOTHING;
             }
         }
     }
-    //绘制初始UI
+    //绘制初始UI,不同renderer实例但影响的是全局StdDraw
     public void drawUI(){
-        UIRenderer.drawTiles(UIBoard);
+        UIRenderer.initialize(UIWidth,UIHeight);
+        UIRenderer.renderFrame(UIBoard);
         String[] menuItems = {"New Game (N)", "Load Game (L)", "Quit (Q)"};
         // 计算每行的 Y 坐标位置
         double centerX = UIWidth/2;
@@ -51,6 +50,7 @@ public class UIBoard {
         double centerX = UIWidth/2;
         double centerY = UIHeight/2;
         StringBuilder seedInput = new StringBuilder();
+
         //show the seedInputUI
         StdDraw.clear(); //clear last UI
         UIRenderer.drawTiles(UIBoard);
