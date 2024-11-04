@@ -12,7 +12,7 @@ public class Room {
     private int goldCnts = 10;
     private List<int[]> centerCoords;//存储每个房间中心坐标
     private List<int[]> baseCoords; //存储每个房间的基坐标
-    private List<int[]> properties; //存储每个房间的宽高
+    private List<int[]> attributes; //存储每个房间的宽高
     private List<Integer> distanceToMST;
     private List<Integer> wannaLinkTo;
     private List<Boolean> visited;
@@ -22,7 +22,7 @@ public class Room {
         this.random = random;
         centerCoords = new ArrayList<>();
         baseCoords = new ArrayList<>();
-        properties = new ArrayList<>();
+        attributes = new ArrayList<>();
         distanceToMST = new ArrayList<>();
         wannaLinkTo = new ArrayList<>();
         visited = new ArrayList<>();
@@ -48,7 +48,7 @@ public class Room {
                 int[] property = {width, height};
                 centerCoords.add(centerCoord);
                 baseCoords.add(baseCoord);
-                properties.add(property);
+                attributes.add(property);
                 visited.add(false);
             }
         }
@@ -76,10 +76,10 @@ public class Room {
     //using prims algorithm
     public void addCorridor(TETile[][] world) {
         initDistance(distanceToMST);
-        for (Integer integer : distanceToMST) {
+        /*for (Integer integer : distanceToMST) {
             System.out.print(integer + " ");
             System.out.println();
-        }
+        }*/
         for (int j = 1; j < roomCnts; j++) {
             int minId = -1;
             int minDist = 1000;
@@ -89,7 +89,7 @@ public class Room {
                     minDist = distanceToMST.get(i);
                 }
             }
-            System.out.println("mindist = " + minDist);
+            /*System.out.println("mindist = " + minDist);*/
 
             int id1 = wannaLinkTo.get(minId);
             connectTowRooms(world, id1, minId);
@@ -148,8 +148,8 @@ public class Room {
 
     }
     private int[] getRandomCoordinateInRoom(int roomId) {
-        int width = properties.get(roomId)[0]; // 房间的宽度
-        int height = properties.get(roomId)[1]; // 房间的高度
+        int width = attributes.get(roomId)[0]; // 房间宽度
+        int height = attributes.get(roomId)[1]; // 房间高度
 
         // 计算房间的有效范围
         int minX = baseCoords.get(roomId)[0];
@@ -192,8 +192,23 @@ public class Room {
         JackCoord[0] = x;
         JackCoord[1] = y;
     }
-
-    public void addGolds(TETile[][] world){
+    public void addHim(TETile[][]world,int[]HimCoord){
+        boolean isJackBorn = false;
+        int x=0,y=0;
+        while(!isJackBorn){
+            int j = random.nextInt(roomCnts);
+            x = centerCoords.get(j)[0];
+            y = centerCoords.get(j)[1];
+            if(world[x][y] == Tileset.FLOOR){
+                world[x][y] = Tileset.HIM;
+                isJackBorn = true;
+            }
+        }
+        HimCoord[0]=x;
+        HimCoord[1]=y;
+    }
+    public void addGolds(TETile[][] world,int goldCnts){
+        this.goldCnts = goldCnts;
         for(int i = 0; i<goldCnts;){
             int j = random.nextInt(roomCnts);
             int x = centerCoords.get(j)[0];
