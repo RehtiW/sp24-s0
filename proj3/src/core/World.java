@@ -7,7 +7,11 @@ import tileengine.TETile;
 import tileengine.Tileset;
 import utils.FileUtils;
 
+import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.Random;
 
 public class World {
@@ -15,7 +19,7 @@ public class World {
     private static int WIDTH = 72;
     private static int HEIGHT = 47;
     private TETile[][] world;
-    private int amountToWin=2;
+    private int amountToWin=10;
     private int[] JackCoord;
     private int[] HimCoord;
     private TERenderer ter;
@@ -223,8 +227,9 @@ public class World {
 
     public void RenderTheWorld(){
         ter.drawTiles(world);
-        System.out.println("drawing...");
+        generateTimeMessage();
         StdDraw.show();
+        ter.resetFont();
     }
 
     public TETile[][] getWorld(){
@@ -274,6 +279,14 @@ public class World {
         return amountToWin;
     }
 
+    private void generateTimeMessage(){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = now.format(formatter);
+        StdDraw.setFont(new Font("Arial", Font.PLAIN, 16));
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(WIDTH-7,HEIGHT-2,formattedDate);
+    }
     private class Node {
         int x, y;
         int gScore; // 从起点到当前节点的代价

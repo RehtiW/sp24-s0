@@ -10,7 +10,7 @@ public class Game {
     private Boolean isQuitGame = false;
     private UIBoard uiBoard;
     private long lastHimMoveTime = System.currentTimeMillis();
-    private final int himMoveInterval = 1000; // HIM 每隔 1000 毫秒移动一次
+    private final int himMoveInterval = 500; //HIM的移动间隔,ms
     public Game(World world,UIBoard ui){
         this.world = world;
         this.uiBoard = ui;
@@ -26,7 +26,7 @@ public class Game {
 
     }
     public void runGame(){
-        int i =1;
+        //int i =1;
         StringBuilder inputBuffer = new StringBuilder();
         while(!isGameOver() && !isQuitGame && !isWin()){
             long currentTime = System.currentTimeMillis();
@@ -35,12 +35,11 @@ public class Game {
                 /*System.out.println("tryMoveHim "+i+"times");*/
                 world.moveHim();
                 lastHimMoveTime = currentTime; // 更新上次移动时间
-                i++;
+                //i++;
             }
             if (StdDraw.hasNextKeyTyped()) {
                 char key = StdDraw.nextKeyTyped();
                 if (key == ':') {
-                    System.out.println(key);
                     inputBuffer.append(key);
                 }else if(key == 'q'){
                     if(inputBuffer.toString().equals(":")){
