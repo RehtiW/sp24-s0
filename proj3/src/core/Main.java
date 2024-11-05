@@ -16,9 +16,16 @@ public class Main {
                 switch (key) {
                     case 'n':
                         UI.seedInputUI();
-                        World test = new World(UI.getSeed());
-                        Game game = new Game(test, UI);
-                        game.runGame();
+                        World test1 = new World(UI.getSeed());
+                        test1.generateAndRenderTheWorld();
+                        Game game1 = new Game(test1, UI);
+                        game1.runGame();
+                        break;
+                    case 'l':
+                        World test2 = new World("E:\\cs61b\\sp24-s0\\proj3\\src\\save.txt");
+                        test2.RenderTheWorld();
+                        Game game2 = new Game(test2, UI);
+                        game2.runGame();
                         break;
                     case 'q':
                         allOver = true;
